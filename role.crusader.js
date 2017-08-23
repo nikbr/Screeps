@@ -11,7 +11,35 @@ let crusaderFlag = Game.flags.Crusader;
 module.exports = {
     run: function(creep) {
         if (creep.room.name === creep.memory.target) {
-            let towers = creep.room.find(FIND_STRUCTURES, {
+            let closestEnemy = creep.pos.findClosestByPath(FIND_HOSTILE_CREEPS);
+            if (closestEnemy!==null&&closestEnemy!==undefined){
+                if (creep.attack(closestEnemy) === ERR_NOT_IN_RANGE) {
+                    creep.moveTo(closestEnemy);
+                }
+            }
+
+            creep.say('DEUS VULT', true);
+        }else if(creep.room.name===crusaderFlag.memory.home&&crusaderFlag.room!==undefined&&crusaderFlag.room!==null){
+
+            if(atRallyPoint(crusaderFlag)<creep.memory.squad&&!creep.memory.attacking&&!forceAttack) {
+                console.log(atRallyPoint(crusaderFlag));
+                creep.moveTo(crusaderFlag);
+            }else{
+                creep.memory.attacking = true;
+                forceAttack = true;
+                let exit = creep.room.findExitTo(creep.memory.target);
+                creep.moveTo(creep.pos.findClosestByRange(exit), {visualizePathStyle: {stroke: '#990424'}});
+                creep.say('AVE MARIA', true);
+            }
+        }else{
+            let exit = creep.room.findExitTo(creep.memory.target);
+            creep.moveTo(creep.pos.findClosestByRange(exit), {visualizePathStyle: {stroke: '#990424'}});
+            creep.say('☩', true);
+        }
+    }
+};
+/*
+let towers = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
                     return structure.structureType === STRUCTURE_TOWER;
                 }
@@ -22,27 +50,6 @@ module.exports = {
                     creep.moveTo(closestTower);
                 }
             }
-
-            creep.say('DEUS VULT');
-        }else if(creep.room.name===crusaderFlag.memory.home){
-            console.log(atRallyPoint(crusaderFlag));
-            if(atRallyPoint(crusaderFlag)<creep.memory.squad&&!creep.memory.attacking&&!forceAttack) {
-                creep.moveTo(crusaderFlag);
-            }else{
-                creep.memory.attacking = true;
-                forceAttack = true;
-                let exit = creep.room.findExitTo(creep.memory.target);
-                creep.moveTo(creep.pos.findClosestByRange(exit), {visualizePathStyle: {stroke: '#990424'}});
-                creep.say('AVE MARIA');
-            }
-        }else{
-            let exit = creep.room.findExitTo(crusaderFlag.memory.home);
-            creep.moveTo(creep.pos.findClosestByRange(exit), {visualizePathStyle: {stroke: '#990424'}});
-            creep.say('☩');
-        }
-    }
-};
-/*
 let extensions = creep.pos.find(FIND_STRUCTURES,{
                    filter: (structure) =>{
                        structure.structureType=== STRUCTURE_EXTENSION;
