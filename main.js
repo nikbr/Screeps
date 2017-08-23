@@ -12,13 +12,13 @@ const spawners = require('spawners');
 const profiler = require('screeps-profiler');
 const roleCrusader = require('role.crusader');
 const roleMilitia = require('role.militia');
+const roleScout = require('role.scout');
 
 const HOME = 'E21N23';
 
 profiler.enable();
 
 module.exports.loop = function () {
-
     profiler.wrap(function() {
         for (let name in Memory.creeps) {
             if (Game.creeps[name] === undefined) {
@@ -61,6 +61,9 @@ module.exports.loop = function () {
             else if (creep.memory.role === 'soldier'&&creep.memory.type === 'crusader') {
                 roleCrusader.run(creep);
             }
+            else if (creep.memory.role==='scout'){
+                crusaderRoom = roleScout.run(creep);
+            }
             else if (creep.memory.role === 'soldier'&&creep.memory.type === 'militia') {
                 roleMilitia.run(creep);
             }
@@ -68,7 +71,7 @@ module.exports.loop = function () {
         let totalEnergyCap = Game.spawns.Spawn1.room.energyCapacityAvailable;
         let minimumNumberOfHarvesters = 2;
         let minimumNumberOfUpgraders = 1;
-        let minimumNumberOfBuilders = 0;
+        let minimumNumberOfBuilders = 1;
         let minimumNumberOfRepairmen = 1;
         let minimumNumberOfGatekeepers = 2;
         let minimumNumberOfLDHarvestersE21N24 = 1;
@@ -78,10 +81,10 @@ module.exports.loop = function () {
         let minimumNumberOfLDBuildersE22N24 = 1;
         let minimumNumberOfLDBuildersE22N23 = 1;
         let minimumNumberOfMilitiaE21N24 = 1;
-        let minimumNumberOfCrusaders = 0;
+        let minimumNumberOfCrusaders = 10;
         //let minimumNumberOfLDRepairmenE22N24 = 1;
         let minimumNumberOfClaimers = 0;
-        //console.log(totalEnergyCap);
+
         let numberOfHarvesters = _.sum(Game.creeps, (c) => c.memory.role === 'harvester');
         let numberOfUpgraders = _.sum(Game.creeps, (c) => c.memory.role === 'upgrader');
         let numberOfBuilders = _.sum(Game.creeps, (c) => c.memory.role === 'builder');
@@ -105,23 +108,33 @@ module.exports.loop = function () {
         if (numberOfHarvesters < minimumNumberOfHarvesters) {
             name = spawners.spawnWorker(totalEnergyCap, 'harvester');
         }
+        else if (numberOfLDHarvestersE21N24 < minimumNumberOfLDHarvestersE21N24) {
+            name = spawners.spawnLDWorker(800, 'ldharvester', HOME, 'E21N24', 0);
+        }
         else if (numberOfUpgraders < minimumNumberOfUpgraders) {
             name = spawners.spawnWorker(totalEnergyCap, 'upgrader');
         }
+        else if (numberOfCrusaders<minimumNumberOfCrusaders) {
+            name = spawners.spawnCrusader(1300, 'E22N26', 7);
+        }
+        else if (numberOfLDHarvestersE22N24 < minimumNumberOfLDHarvestersE22N24) {
+            name = spawners.spawnLDWorker(800, 'ldharvester', HOME, 'E22N24', 0);
+        }
+        else if (numberOfLDHarvestersE22N23 < minimumNumberOfLDHarvestersE22N23) {
+            name = spawners.spawnLDWorker(800, 'ldharvester', HOME, 'E22N23', 0);
+        }
         else if (numberOfClaimers < minimumNumberOfClaimers) {
             name = spawners.spawnClaimer(totalEnergyCap, 'E21N24');
-        }/*
-        else if (numberOfCrusaders<minimumNumberOfCrusaders) {
-            name = spawners.spawnCrusader(totalEnergyCap, 'E22N26', 1);
-        }*/
+        }
+
         else if (numberOfRepairmen < minimumNumberOfRepairmen) {
-            name = spawners.spawnWorker(600, 'repairman');
+            name = spawners.spawnWorker(1100, 'repairman');
         }
         else if (numberOfGatekeepers < minimumNumberOfGatekeepers) {
             name = spawners.spawnWorker(650, 'gatekeeper');
         }
         else if (numberOfBuilders < minimumNumberOfBuilders) {
-            name = spawners.spawnWorker(totalEnergyCap, 'builder');
+            name = spawners.spawnWorker(1000, 'builder');
         }
 
         else if (numberOfMilitiaE21N24 < minimumNumberOfMilitiaE21N24) {
@@ -130,24 +143,18 @@ module.exports.loop = function () {
         else if (numberOfLDBuildersE21N24 < minimumNumberOfLDBuildersE21N24) {
              name = spawners.spawnLDWorker(500, 'ldbuilder', HOME, 'E21N24', 0);
          }
-         else if (numberOfLDHarvestersE21N24 < minimumNumberOfLDHarvestersE21N24) {
-             name = spawners.spawnLDWorker(800, 'ldharvester', HOME, 'E21N24', 0);
-         }
+
          /*else if (numberOfLDRepairmenE22N24 < minimumNumberOfLDRepairmenE22N24) {
              name = spawners.spawnLDWorker(500, 'ldrepairman', HOME, 'E22N24', 0);
          }*/
         else if (numberOfLDBuildersE22N24 < minimumNumberOfLDBuildersE22N24) {
             name = spawners.spawnLDWorker(500, 'ldbuilder', HOME, 'E22N24', 0);
         }
-        else if (numberOfLDHarvestersE22N24 < minimumNumberOfLDHarvestersE22N24) {
-            name = spawners.spawnLDWorker(800, 'ldharvester', HOME, 'E22N24', 0);
-        }
+
         else if (numberOfLDBuildersE22N23 < minimumNumberOfLDBuildersE22N23) {
             name = spawners.spawnLDWorker(500, 'ldbuilder', HOME, 'E22N23', 0);
         }
-        else if (numberOfLDHarvestersE22N23 < minimumNumberOfLDHarvestersE22N23) {
-            name = spawners.spawnLDWorker(800, 'ldharvester', HOME, 'E22N23', 0);
-        }
+
         else {
             name = spawners.spawnWorker(totalEnergyCap, 'builder');
         }
@@ -162,6 +169,7 @@ module.exports.loop = function () {
                 tower.attack(target);
             }
         }
+
     });
 
 };

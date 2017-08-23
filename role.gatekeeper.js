@@ -27,9 +27,20 @@ module.exports = {
                 roleLoader.run(creep);
             }
         } else {
-            var source = creep.pos.findClosestByPath(FIND_SOURCES);
-            if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
-                creep.moveTo(source);
+            let droppedResources = creep.pos.findClosestByPath(FIND_DROPPED_RESOURCES,{
+                filter: (s) => {
+                    return s.amount>25;
+                }
+            });
+            if (droppedResources !== undefined&&droppedResources!==null) {
+                if (creep.pickup(droppedResources) === ERR_NOT_IN_RANGE) {
+                    creep.moveTo(droppedResources, {visualizePathStyle: {stroke: '#990424'}});
+                }
+            }else {
+                let source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+                if (creep.harvest(source) === ERR_NOT_IN_RANGE) {
+                    creep.moveTo(source);
+                }
             }
         }
     }

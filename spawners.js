@@ -85,7 +85,8 @@ module.exports = {
             role: 'soldier',
             type: 'crusader',
             target: target,
-            squad: squad
+            squad: squad,
+            attacking: false
         });
 
     },
@@ -102,6 +103,12 @@ module.exports = {
         return Game.spawns.Spawn1.createCreep(base, undefined, {
             role: 'soldier',
             type: 'militia',
+            target: target
+        });
+    },
+    spawnScout : function(target) {
+        return Game.spawns.Spawn1.createCreep([MOVE, MOVE, MOVE], undefined, {
+            role: 'scout',
             target: target
         });
     }
