@@ -88,5 +88,21 @@ module.exports = {
             squad: squad
         });
 
+    },
+    spawnMilitia : function(totalEnergyCap, target) {
+        let base = [RANGED_ATTACK, TOUGH, MOVE, MOVE];
+        let energyLeft = totalEnergyCap-260;
+        while(energyLeft>=260){
+            base.push(MOVE);
+            base.push(MOVE);
+            base.push(TOUGH);
+            base.push(RANGED_ATTACK);
+            energyLeft-=260;
+        }
+        return Game.spawns.Spawn1.createCreep(base, undefined, {
+            role: 'soldier',
+            type: 'militia',
+            target: target
+        });
     }
 };

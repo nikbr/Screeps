@@ -10,6 +10,8 @@ const roleLDRepairman = require('role.ldrepairman');
 const roleClaimer = require('role.claimer');
 const spawners = require('spawners');
 const profiler = require('screeps-profiler');
+const roleCrusader = require('role.crusader');
+const roleMilitia = require('role.militia');
 
 const HOME = 'E21N23';
 
@@ -56,6 +58,12 @@ module.exports.loop = function () {
             else if (creep.memory.role === 'claimer') {
                 roleClaimer.run(creep);
             }
+            else if (creep.memory.role === 'soldier'&&creep.memory.type === 'crusader') {
+                roleCrusader.run(creep);
+            }
+            else if (creep.memory.role === 'soldier'&&creep.memory.type === 'militia') {
+                roleMilitia.run(creep);
+            }
         }
         let totalEnergyCap = Game.spawns.Spawn1.room.energyCapacityAvailable;
         let minimumNumberOfHarvesters = 2;
@@ -69,6 +77,8 @@ module.exports.loop = function () {
         let minimumNumberOfLDBuildersE21N24 = 1;
         let minimumNumberOfLDBuildersE22N24 = 1;
         let minimumNumberOfLDBuildersE22N23 = 1;
+        let minimumNumberOfMilitiaE21N24 = 1;
+        let minimumNumberOfCrusaders = 0;
         //let minimumNumberOfLDRepairmenE22N24 = 1;
         let minimumNumberOfClaimers = 0;
         //console.log(totalEnergyCap);
@@ -77,6 +87,8 @@ module.exports.loop = function () {
         let numberOfBuilders = _.sum(Game.creeps, (c) => c.memory.role === 'builder');
         let numberOfRepairmen = _.sum(Game.creeps, (c) => c.memory.role === 'repairman');
         let numberOfGatekeepers = _.sum(Game.creeps, (c) => c.memory.role === 'gatekeeper');
+        let numberOfCrusaders = _.sum(Game.creeps, (c) => c.memory.type === 'crusader');
+
 
         let numberOfLDHarvestersE21N24 = _.sum(Game.creeps, (c) => c.memory.role === 'ldharvester' && c.memory.target === 'E21N24');
         let numberOfLDHarvestersE22N24 = _.sum(Game.creeps, (c) => c.memory.role === 'ldharvester' && c.memory.target === 'E22N24');
@@ -84,6 +96,7 @@ module.exports.loop = function () {
         let numberOfLDBuildersE21N24 = _.sum(Game.creeps, (c) => c.memory.role === 'ldbuilder' && c.memory.target === 'E21N24');
         let numberOfLDBuildersE22N24 = _.sum(Game.creeps, (c) => c.memory.role === 'ldbuilder' && c.memory.target === 'E22N24');
         let numberOfLDBuildersE22N23 = _.sum(Game.creeps, (c) => c.memory.role === 'ldbuilder' && c.memory.target === 'E22N23');
+        let numberOfMilitiaE21N24 = _.sum(Game.creeps, (c) => c.memory.type === 'militia'&& c.memory.target === 'E21N24');
         //let numberOfLDRepairmenE22N24 = _.sum(Game.creeps, (c) => c.memory.role === 'ldrepairman' && c.memory.target === 'E22N24');
 
         let numberOfClaimers = _.sum(Game.creeps, (c) => c.memory.role === 'claimer');
@@ -97,7 +110,10 @@ module.exports.loop = function () {
         }
         else if (numberOfClaimers < minimumNumberOfClaimers) {
             name = spawners.spawnClaimer(totalEnergyCap, 'E21N24');
-        }
+        }/*
+        else if (numberOfCrusaders<minimumNumberOfCrusaders) {
+            name = spawners.spawnCrusader(totalEnergyCap, 'E22N26', 1);
+        }*/
         else if (numberOfRepairmen < minimumNumberOfRepairmen) {
             name = spawners.spawnWorker(600, 'repairman');
         }
@@ -107,15 +123,19 @@ module.exports.loop = function () {
         else if (numberOfBuilders < minimumNumberOfBuilders) {
             name = spawners.spawnWorker(totalEnergyCap, 'builder');
         }
+
+        else if (numberOfMilitiaE21N24 < minimumNumberOfMilitiaE21N24) {
+             name = spawners.spawnMilitia(520, 'E21N24');
+         }
         else if (numberOfLDBuildersE21N24 < minimumNumberOfLDBuildersE21N24) {
-            name = spawners.spawnLDWorker(500, 'ldbuilder', HOME, 'E21N24', 0);
-        }
-        else if (numberOfLDHarvestersE21N24 < minimumNumberOfLDHarvestersE21N24) {
-            name = spawners.spawnLDWorker(800, 'ldharvester', HOME, 'E21N24', 0);
-        }
-        /*else if (numberOfLDRepairmenE22N24 < minimumNumberOfLDRepairmenE22N24) {
-            name = spawners.spawnLDWorker(500, 'ldrepairman', HOME, 'E22N24', 0);
-        }*/
+             name = spawners.spawnLDWorker(500, 'ldbuilder', HOME, 'E21N24', 0);
+         }
+         else if (numberOfLDHarvestersE21N24 < minimumNumberOfLDHarvestersE21N24) {
+             name = spawners.spawnLDWorker(800, 'ldharvester', HOME, 'E21N24', 0);
+         }
+         /*else if (numberOfLDRepairmenE22N24 < minimumNumberOfLDRepairmenE22N24) {
+             name = spawners.spawnLDWorker(500, 'ldrepairman', HOME, 'E22N24', 0);
+         }*/
         else if (numberOfLDBuildersE22N24 < minimumNumberOfLDBuildersE22N24) {
             name = spawners.spawnLDWorker(500, 'ldbuilder', HOME, 'E22N24', 0);
         }
